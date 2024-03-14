@@ -1,0 +1,18 @@
+[package]
+name = "cadmium-yellow"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = { version = "0.4.35", features = ["serde"] }
+lazy_static = "1.4.0"
+reqwest = { version = "0.11.26", default-features = false, features = ["rustls-tls", "json"] }
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.114"
+
+[dev-dependencies]
+tokio = { version = "1.36.0", features = ["rt-multi-thread", "macros"] }
+
+[build-dependencies]
+lazy_static = "1.4.0"
+reqwest = { version = "0.11.26", default-features = false, features = ["rustls-tls", "blocking"] }
