@@ -1,6 +1,6 @@
 [package]
 name = "cadmium-yellow"
-version = "0.1.0"
+version = "2024.3.0"
 edition = "2021"
 
 [dependencies]
