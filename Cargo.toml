@@ -1,6 +1,15 @@
 [package]
 name = "cadmium-yellow"
 version = "2024.3.0"
+
+description = "A client library for the unofficial Nexus Tyne and Wear Metro real time information API"
+readme = "README.md"
+
+homepage = "https://github.com/DanNixon/cadmium-yellow"
+repository = "https://github.com/DanNixon/cadmium-yellow"
+
+license = "MIT"
+
 edition = "2021"
 
 [dependencies]
