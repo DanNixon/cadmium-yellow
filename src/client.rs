@@ -57,7 +57,7 @@ impl Client {
     pub async fn station_names(&self) -> HashMap<String, String> {
         match self.source {
             DataSource::Baked => {
-                serde_json::from_str(include_str!("./data/station_names.json")).unwrap()
+                serde_json::from_str(include_str!(env!("STATION_NAMES_JSON_FILE"))).unwrap()
             }
             DataSource::Api => self
                 .client
@@ -76,7 +76,7 @@ impl Client {
     pub async fn platforms(&self) -> HashMap<String, Vec<crate::Platform>> {
         match self.source {
             DataSource::Baked => {
-                serde_json::from_str(include_str!("./data/platforms.json")).unwrap()
+                serde_json::from_str(include_str!(env!("PLATFORMS_JSON_FILE"))).unwrap()
             }
             DataSource::Api => self
                 .client

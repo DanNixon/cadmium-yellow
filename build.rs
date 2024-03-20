@@ -1,6 +1,5 @@
 use reqwest::{blocking::Client, header::HeaderMap};
-use std::fs::File;
-use std::io::Write;
+use std::{fs::File, io::Write};
 
 const API_URL_BASE: &str = "https://metro-rti.nexus.org.uk/api";
 const USER_AGENT: &str = "okhttp/3.12.1";
@@ -23,22 +22,19 @@ fn get_json_file(client: &Client, headers: &HeaderMap, url: &str, path: &str) {
 fn main() {
     let client = Client::new();
 
+    let out_dir = std::env::var("OUT_DIR").unwrap();
+
     let headers = {
         let mut headers = HeaderMap::new();
         headers.insert(reqwest::header::USER_AGENT, USER_AGENT.parse().unwrap());
         headers
     };
 
-    get_json_file(
-        &client,
-        &headers,
-        &STATIONS_URL,
-        "./src/data/station_names.json",
-    );
-    get_json_file(
-        &client,
-        &headers,
-        &PLATFORMS_URL,
-        "./src/data/platforms.json",
-    );
+    let filename = format!("{out_dir}/station_names.json");
+    get_json_file(&client, &headers, &STATIONS_URL, &filename);
+    println!("cargo:rustc-env=STATION_NAMES_JSON_FILE={filename}");
+
+    let filename = format!("{out_dir}/platforms.json");
+    get_json_file(&client, &headers, &PLATFORMS_URL, &filename);
+    println!("cargo:rustc-env=PLATFORMS_JSON_FILE={filename}");
 }
