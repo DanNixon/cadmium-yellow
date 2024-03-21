@@ -1,21 +1,5 @@
 use chrono::{DateTime, FixedOffset, TimeDelta};
-use serde::Deserialize;
-
-fn deserialize_due_time_to_optional_timedelta<'de, D>(
-    deserializer: D,
-) -> Result<Option<TimeDelta>, D::Error>
-where
-    D: serde::Deserializer<'de>,
-{
-    let minutes: i64 = Deserialize::deserialize(deserializer)?;
-    if minutes == -1 {
-        Ok(None)
-    } else {
-        Ok(Some(
-            TimeDelta::try_minutes(minutes).expect("time in minutes should fit into a TimeDelta"),
-        ))
-    }
-}
+use serde::{Deserialize, Deserializer};
 
 #[derive(Debug, Eq, PartialEq, Deserialize)]
 pub struct Train {
@@ -30,12 +14,40 @@ pub struct Train {
     #[serde(flatten)]
     last_event: TrainEvent,
 
-    /// Estimated time until the train arrives on the platform, None if the train has arrived at the platform.
-    #[serde(
-        rename = "dueIn",
-        deserialize_with = "deserialize_due_time_to_optional_timedelta"
-    )]
-    due_in: Option<TimeDelta>,
+    /// When the train is due to arrive at the platform
+    #[serde(rename = "dueIn")]
+    due: TrainArrival,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum TrainArrival {
+    /// The train has arrived at the platform
+    Arrived,
+
+    /// The train will be immanently arriving at the platform
+    Due,
+
+    /// The train is due to arrive at the platform in a given amount of time
+    DueIn(TimeDelta),
+}
+
+impl<'de> Deserialize<'de> for TrainArrival {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let minutes: i64 = Deserialize::deserialize(deserializer)?;
+        if minutes == -1 {
+            Ok(Self::Arrived)
+        } else if minutes == 0 {
+            Ok(Self::Due)
+        } else {
+            Ok(Self::DueIn(
+                TimeDelta::try_minutes(minutes)
+                    .expect("time in minutes should fit into a TimeDelta"),
+            ))
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq, Deserialize)]
