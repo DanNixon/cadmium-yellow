@@ -1,6 +1,6 @@
 [package]
 name = "cadmium-yellow"
-version = "2024.3.0"
+version = "2024.3.1"
 
 description = "A client library for the unofficial Nexus Tyne and Wear Metro real time information API"
 readme = "README.md"
