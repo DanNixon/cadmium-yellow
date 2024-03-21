@@ -54,59 +54,53 @@ impl Client {
     }
 
     /// Get a list of all station names and codes.
-    pub async fn station_names(&self) -> HashMap<String, String> {
-        match self.source {
-            DataSource::Baked => {
-                serde_json::from_str(include_str!("../data/station_names.json")).unwrap()
+    pub async fn station_names(&self) -> crate::Result<HashMap<String, String>> {
+        Ok(match self.source {
+            DataSource::Baked => serde_json::from_str(include_str!("../data/station_names.json"))?,
+            DataSource::Api => {
+                self.client
+                    .get(STATIONS_URL.clone())
+                    .headers(Self::headers())
+                    .send()
+                    .await?
+                    .json()
+                    .await?
             }
-            DataSource::Api => self
-                .client
-                .get(STATIONS_URL.clone())
-                .headers(Self::headers())
-                .send()
-                .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap(),
-        }
+        })
     }
 
     /// Get a list of platforms at each station.
-    pub async fn platforms(&self) -> HashMap<String, Vec<crate::Platform>> {
-        match self.source {
-            DataSource::Baked => {
-                serde_json::from_str(include_str!("../data/platforms.json")).unwrap()
+    pub async fn platforms(&self) -> crate::Result<HashMap<String, Vec<crate::Platform>>> {
+        Ok(match self.source {
+            DataSource::Baked => serde_json::from_str(include_str!("../data/platforms.json"))?,
+            DataSource::Api => {
+                self.client
+                    .get(PLATFORMS_URL.clone())
+                    .headers(Self::headers())
+                    .send()
+                    .await?
+                    .json()
+                    .await?
             }
-            DataSource::Api => self
-                .client
-                .get(PLATFORMS_URL.clone())
-                .headers(Self::headers())
-                .send()
-                .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap(),
-        }
+        })
     }
 
     /// Get a list of all stations and platforms at those stations, complete with as much
     /// information as the API provides.
-    pub async fn stations(&self) -> Vec<crate::Station> {
-        let station_names = self.station_names().await;
-        let mut platforms = self.platforms().await;
+    pub async fn stations(&self) -> crate::Result<Vec<crate::Station>> {
+        let station_names = self.station_names().await?;
+        let mut platforms = self.platforms().await?;
 
         assert!(station_names.len() == platforms.len());
 
-        station_names
+        Ok(station_names
             .into_iter()
             .map(|(code, name)| crate::Station {
                 platforms: platforms.remove(&code).unwrap(),
                 code,
                 name,
             })
-            .collect()
+            .collect())
     }
 
     /// Get the next trains to arrive at a given platform at a given station.
@@ -114,17 +108,16 @@ impl Client {
         &self,
         station: &crate::Station,
         platform: &crate::Platform,
-    ) -> Vec<crate::Train> {
+    ) -> crate::Result<Vec<crate::Train>> {
         let url = times_url(&station.code, platform.number);
 
-        self.client
+        Ok(self
+            .client
             .get(url)
             .headers(Self::headers())
             .send()
-            .await
-            .unwrap()
+            .await?
             .json()
-            .await
-            .unwrap()
+            .await?)
     }
 }

@@ -2,7 +2,7 @@
 async fn main() {
     let client = cadmium_yellow::Client::new(cadmium_yellow::DataSource::Api);
 
-    let mut stations = client.stations().await;
+    let mut stations = client.stations().await.unwrap();
     stations.sort();
 
     for station in stations {
