@@ -85,6 +85,10 @@ impl Client {
         })
     }
 
+    pub fn lines(&self) -> crate::Result<Vec<crate::Line>> {
+        Ok(serde_json::from_str(include_str!("../data/lines.json"))?)
+    }
+
     /// Get a list of all stations and platforms at those stations, complete with as much
     /// information as the API provides.
     pub async fn stations(&self) -> crate::Result<Vec<crate::Station>> {
@@ -119,5 +123,27 @@ impl Client {
             .await?
             .json()
             .await?)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[tokio::test]
+    async fn all_stations_on_lines_exist() {
+        let client = Client::default();
+
+        let stations = client.stations().await.unwrap();
+        let lines = client.lines().unwrap();
+
+        for line in lines {
+            println!("{}", line.name);
+            for station_code in line.stations {
+                println!("{}", station_code);
+                let station = stations.iter().find(|s| s.code == station_code);
+                assert!(station.is_some());
+            }
+        }
     }
 }
