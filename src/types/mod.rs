@@ -4,8 +4,8 @@ mod station;
 mod train;
 
 pub use self::{
-    line::Line,
+    line::{Line, LineName},
     platform::Platform,
     station::Station,
-    train::{Train, TrainEvent, TrainEventKind},
+    train::{Train, TrainArrival, TrainEvent, TrainEventKind},
 };
