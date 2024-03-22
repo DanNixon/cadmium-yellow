@@ -5,18 +5,21 @@ use serde::{Deserialize, Deserializer};
 pub struct Train {
     /// Identifier of (I assume) the Metrocar that serves this service
     #[serde(rename = "trn")]
-    id: String,
+    pub id: String,
 
     /// Line that the train operates on
-    line: crate::Line,
+    pub line: crate::LineName,
+
+    /// Destination of the train
+    pub destination: String,
 
     /// The last reported position/activity of the train
     #[serde(flatten)]
-    last_event: TrainEvent,
+    pub last_event: TrainEvent,
 
     /// When the train is due to arrive at the platform
     #[serde(rename = "dueIn")]
-    due: TrainArrival,
+    pub due: TrainArrival,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -54,15 +57,15 @@ impl<'de> Deserialize<'de> for TrainArrival {
 pub struct TrainEvent {
     /// Type of event/what has happened
     #[serde(rename = "lastEvent")]
-    kind: TrainEventKind,
+    pub kind: TrainEventKind,
 
     /// Time that the event took place
     #[serde(rename = "lastEventTime")]
-    time: DateTime<FixedOffset>,
+    pub time: DateTime<FixedOffset>,
 
     //Human friendly location that the event took place
     #[serde(rename = "lastEventLocation")]
-    location: String,
+    pub location: String,
 }
 
 #[derive(Debug, Eq, PartialEq, Deserialize)]
