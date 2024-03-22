@@ -29,5 +29,8 @@ jobs:
       - name: Clippy
         run: nix develop --command cargo clippy --all-targets -- -D warnings
 
+      - name: Test
+        run: nix develop --command cargo test --all-targets
+
       - name: Build
         run: nix develop --command cargo build --all-targets
