@@ -10,6 +10,9 @@ repository = "https://github.com/DanNixon/cadmium-yellow"
 
 license = "MIT"
 
+categories = ["api-bindings"]
+keywords = ["real-time-information", "nexus", "tyne-and-wear-metro", "api", "api-client"]
+
 edition = "2021"
 
 [dependencies]
